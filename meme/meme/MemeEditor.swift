@@ -8,15 +8,27 @@
 
 import UIKit
 
-class MemeEditor: UIViewController, UIImagePickerControllerDelegate,
-UINavigationControllerDelegate, UITextFieldDelegate {
+class MemeEditor:   UIViewController,
+                    UIImagePickerControllerDelegate,
+                    UINavigationControllerDelegate,
+                    UITextFieldDelegate {
 
-    // MARK: Variables
+    // MARK: - Variables
     
     // Text Field Delegate objects
     let topTextFieldDelegate = TopTextFieldDelegate()
+
+    // MARK: - Outlets
     
-    // MARK: Life cycle methods
+    @IBOutlet weak var ImagePickerView: UIImageView!
+    @IBOutlet weak var topText: UITextField!
+    @IBOutlet weak var bottomText: UITextField!
+    @IBOutlet weak var cameraButton: UIBarButtonItem!
+    @IBOutlet weak var toolBar: UIToolbar!
+    @IBOutlet weak var topToolBar: UIToolbar!
+    @IBOutlet weak var shareButton: UIBarButtonItem!
+    
+    // MARK: - Lifecycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -54,36 +66,11 @@ UINavigationControllerDelegate, UITextFieldDelegate {
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
         
-        //==> Console info
-        println("> Enter editor view")
-        
         // Enable the camera button only on devices that have one
         cameraButton.enabled = UIImagePickerController.isSourceTypeAvailable(UIImagePickerControllerSourceType.Camera)
     }
     
-    override func viewWillDisappear(animated: Bool) {
-        super.viewWillDisappear(animated)
-        
-        //==> Console info
-        println("> Exit editor view")
-    }
-    
-    deinit {
-        //==> Console info
-        println("> Deconstruct editor view")
-    }
-
-    // MARK: Outlets
-    
-    @IBOutlet weak var ImagePickerView: UIImageView!
-    @IBOutlet weak var topText: UITextField!
-    @IBOutlet weak var bottomText: UITextField!
-    @IBOutlet weak var cameraButton: UIBarButtonItem!
-    @IBOutlet weak var toolBar: UIToolbar!
-    @IBOutlet weak var topToolBar: UIToolbar!
-    @IBOutlet weak var shareButton: UIBarButtonItem!
-    
-    // MARK: Actions
+    // MARK: - Actions
     
     @IBAction func PickImageFromAlbum(sender: AnyObject) {
         // Initialize the image picker controller
@@ -102,6 +89,7 @@ UINavigationControllerDelegate, UITextFieldDelegate {
         Available only on devices that have a camera
     */
     @IBAction func PickImageFromCamera(sender: AnyObject) {
+        
         // Initialize the image picker controller
         let picker = UIImagePickerController()
         
@@ -115,6 +103,7 @@ UINavigationControllerDelegate, UITextFieldDelegate {
     }
     
     @IBAction func shareMeme(sender: AnyObject) {
+        
         // Generate a memed image
         let image = self.generateMemedImage()
         
@@ -128,8 +117,9 @@ UINavigationControllerDelegate, UITextFieldDelegate {
         
         // Control flow when the activity controller exits
         activityViewController.completionWithItemsHandler = {
+            
             // Save the meme just before dismissing the activity view
-            (s: String!, ok: Bool, items: [AnyObject]!, err:NSError!) -> Void in
+            (s: String?, ok: Bool, items: [AnyObject]?, err:NSError?) -> Void in
             
             // Save the meme only if a valid action is selected, do not save
             // if the user selects the Cancel option
@@ -139,21 +129,26 @@ UINavigationControllerDelegate, UITextFieldDelegate {
             }
             
             // Go to the Sent Meme View options with modal presentation
-            var storyboard = UIStoryboard (name: "Main", bundle: nil)
-            var nextVC = storyboard.instantiateViewControllerWithIdentifier("MemeTable") as MemeTable
-            self.presentViewController(nextVC, animated: true, completion: nil)
+            
+            NSOperationQueue.mainQueue().addOperationWithBlock {
+                let storyboard = UIStoryboard (name: "Main", bundle: nil)
+                let nextVC = storyboard.instantiateViewControllerWithIdentifier("MemeTable") as! MemeTable
+                self.presentViewController(nextVC, animated: true, completion: nil)
+            }
         }
     }
     
     @IBAction func exitEditor(sender: AnyObject) {
+        
         // Dismiss the editor in order to get back to the sent memes being
         // the presenting view controller
         self.dismissViewControllerAnimated(true, completion: nil)
     }
     
-    // MARK: Image capture functions
+    // MARK: - Image capture functions
     
     func generateMemedImage() -> UIImage {
+        
         // Hide the toolbars
         self.topToolBar.hidden = true
         self.toolBar.hidden = true
@@ -172,11 +167,13 @@ UINavigationControllerDelegate, UITextFieldDelegate {
     }
     
     func saveMeme() {
+        
         // Check that an image exists on the picker before attempting to
         // greate a meme
-        if ( (self.ImagePickerView.image) != nil ) {
+        if ((self.ImagePickerView.image) != nil ) {
+            
             // Save the meme into the model struct
-            var meme = Meme(
+            let meme = Meme(
                 topText: topText.text!,
                 bottomText: bottomText.text!,
                 originalImage: self.ImagePickerView.image!,
@@ -185,14 +182,15 @@ UINavigationControllerDelegate, UITextFieldDelegate {
             
             // Add it to the memes array in the Application Delegate
             let object = UIApplication.sharedApplication().delegate
-            let appDelegate = object as AppDelegate
+            let appDelegate = object as! AppDelegate
             appDelegate.memes.append(meme)
         }
     }
     
-    // MARK: Keyboard functions
+    // MARK: - Keyboard
     
     func keyboardWillShow(notification: NSNotification) {
+        
         // Reset the view to it's original position every time the
         // keyboard is about to show to counter for different keyboard
         // heights (ie when changing language or emoticons) during the
@@ -213,14 +211,15 @@ UINavigationControllerDelegate, UITextFieldDelegate {
     */
     func getKeyboardHeight(notification: NSNotification) -> CGFloat {
         let userInfo = notification.userInfo
-        let keyboardSize = userInfo![UIKeyboardFrameEndUserInfoKey] as NSValue // of CGRect
+        let keyboardSize = userInfo![UIKeyboardFrameEndUserInfoKey] as! NSValue // of CGRect
         return keyboardSize.CGRectValue().height
     }
     
-    // MARK: Image Picker delegates
+    // MARK: - Image Picker Delegate
     
-    func imagePickerController(picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [NSObject : AnyObject]) {
+    func imagePickerController(picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : AnyObject]) {
         if let image = info[UIImagePickerControllerEditedImage] as? UIImage {
+            
             // Force the text to be on the image by using aspect fill
             self.ImagePickerView.contentMode = .ScaleAspectFill
             self.ImagePickerView.image = image
@@ -238,11 +237,12 @@ UINavigationControllerDelegate, UITextFieldDelegate {
     }
     
     func imagePickerControllerDidCancel(picker: UIImagePickerController) {
+        
         // Opt to dismiss the picker
         self.dismissViewControllerAnimated(true, completion: nil)
     }
     
-    // MARK: Text Field delegates (bottom text)
+    // MARK: - Text Field Delegate (bottom text)
     
     /**
         In this delegate the keyboard subscriptions are integrated. They are
@@ -266,7 +266,7 @@ UINavigationControllerDelegate, UITextFieldDelegate {
         return true
     }
     
-    // MARK: Notification subscriptions
+    // MARK: - Notification subscriptions
     
     func subscribeToKeyboardNotifications() {
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "keyboardWillShow:", name: UIKeyboardWillShowNotification, object: nil)

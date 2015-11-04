@@ -9,13 +9,13 @@
 import Foundation
 import UIKit
 
-class MemeCollection: UICollectionViewController, UICollectionViewDataSource {
+class MemeCollection: UICollectionViewController {
     
-    // MARK: Model
+    // MARK: - Properties
     
     var memes: [Meme]!
     
-    // MARK: Life cycle
+    // MARK: - Lifecycle
     
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
@@ -26,36 +26,25 @@ class MemeCollection: UICollectionViewController, UICollectionViewDataSource {
         
         // Get the meme data from the AppDelegate
         let object = UIApplication.sharedApplication().delegate
-        let appDelegate = object as AppDelegate
+        let appDelegate = object as! AppDelegate
         memes = appDelegate.memes
-        
-        //==> Console info
-        println("-> Enter collection view with #memes = \(memes.count)")
     }
     
-    override func viewWillDisappear(animated: Bool) {
-        //==> Console info
-        println("-> Exit collection view")
-    }
-    
-    deinit {
-        //==> Console info
-        println("-> Deconstruct collection view")
-    }
-    
-    // MARK: Actions
+    // MARK: - Actions
     
     @IBAction func switchToEditMode(sender: AnyObject) {
         // Modally present the Meme editor:
-        // Grab the storyboard
-        var storyboard = UIStoryboard (name: "Main", bundle: nil)
-        // Get the destination view controller from the storyboard id
-        var nextVC = storyboard.instantiateViewControllerWithIdentifier("MemeEditor") as MemeEditor
-        // Go to the editor controller
-        self.presentViewController(nextVC, animated: true, completion: nil)
+        NSOperationQueue.mainQueue().addOperationWithBlock {
+            // Grab the storyboard
+            let storyboard = UIStoryboard (name: "Main", bundle: nil)
+            // Get the destination view controller from the storyboard id
+            let nextVC = storyboard.instantiateViewControllerWithIdentifier("MemeEditor") as! MemeEditor
+            // Go to the editor controller
+            self.presentViewController(nextVC, animated: true, completion: nil)
+        }
     }
     
-    // MARK: Collection View Data Source
+    // MARK: - Collection View Delegate
     
     /**
         Items count
@@ -67,13 +56,12 @@ class MemeCollection: UICollectionViewController, UICollectionViewDataSource {
     /**
         Cell at index path
     */
-    override func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
-        //==> Console info
-        println("--> IndexPath item: \(indexPath.item)" )
+    override func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) ->
+        UICollectionViewCell {
         
         // 1. Dequeue a reusable cell from the table, using the correct “reuse identifier”
         let cell = collectionView.dequeueReusableCellWithReuseIdentifier("MemeCollectionCell", forIndexPath: indexPath)
-            as MemeCollectionCell
+            as! MemeCollectionCell
         
         // 2. Find the model object that corresponds to that item
         let meme = self.memes[indexPath.item]
@@ -89,12 +77,14 @@ class MemeCollection: UICollectionViewController, UICollectionViewDataSource {
         Detail view
     */
     override func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath:NSIndexPath) {
-        // Grab the detail controller from the storyboard
-        let detailController = self.storyboard!.instantiateViewControllerWithIdentifier("MemeDetails")! as MemeDetails
-        // Assign the respective meme at index
-        detailController.meme = self.memes[indexPath.item]
-        // Go to the details view
-        self.navigationController?.pushViewController(detailController, animated: true)
+        NSOperationQueue.mainQueue().addOperationWithBlock {
+            // Grab the detail controller from the storyboard
+            let detailController = self.storyboard!.instantiateViewControllerWithIdentifier("MemeDetails") as! MemeDetails
+            // Assign the respective meme at index
+            detailController.meme = self.memes[indexPath.item]
+            // Go to the details view
+            self.navigationController?.pushViewController(detailController, animated: true)
+        }
     }
     
 }
