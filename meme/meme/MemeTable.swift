@@ -25,36 +25,29 @@ class MemeTable: UITableViewController {
         let appDelegate = object as! AppDelegate
         memes = appDelegate.memes
         
-        // If there are no images, goto the Edit Memes without implying 
-        // any animation
+        // If there are no images, goto the Edit Memes without implying any animation
         if (memes.count == 0) {
-            // Modally present the Meme editor:
             self.switchToEditMode(false)
         } else {
-            // Reload the table data only if there are one memes or more
             tableView.reloadData()
         }
     }
     
     // MARK: - Actions
     
+    /// Modally present the Meme editor
     @IBAction func EditMeme(sender: AnyObject) {
-        // Modally present the Meme editor
         self.switchToEditMode(true)
     }
     
     // MARK: - Table View Delegate
     
-    /**
-        Number of rows
-    */
+    /// Number of rows
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return self.memes.count
     }
     
-    /**
-        Cell for row at index path
-    */
+    /// Cell for row at index path
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         
         // 1. Dequeue a reusable cell from the table, using the correct “reuse identifier”
@@ -71,15 +64,10 @@ class MemeTable: UITableViewController {
         return cell
     }
 
-    /**
-        Detail view
-    */
+    /// Detail view
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        // Grab the detail controller from the storyboard
         let detailController = self.storyboard!.instantiateViewControllerWithIdentifier("MemeDetails") as! MemeDetails
-        // Assign the meme at index
         detailController.meme = self.memes[indexPath.row]
-        // Go to the detail view
         self.navigationController?.pushViewController(detailController, animated: true)
     }
     
@@ -87,11 +75,8 @@ class MemeTable: UITableViewController {
     
     func switchToEditMode(animation: Bool) {
         NSOperationQueue.mainQueue().addOperationWithBlock {
-            // Grab storyboard
             let storyboard = UIStoryboard (name: "Main", bundle: nil)
-            // Get the destination controller from the storyboard id
             let nextVC = storyboard.instantiateViewControllerWithIdentifier("MemeEditor") as! MemeEditor
-            // Go to the destination controller
             self.presentViewController(nextVC, animated: animation, completion: nil)
         }
     }

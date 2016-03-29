@@ -20,8 +20,7 @@ class MemeCollection: UICollectionViewController {
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
         
-        // Reload the data here in order to fix the bug that caused only the first
-        // meme to appear on the collection view
+        // Reload the data here in order to fix the bug that caused only the first meme to appear on the collection view
         collectionView?.reloadData()
         
         // Get the meme data from the AppDelegate
@@ -32,30 +31,23 @@ class MemeCollection: UICollectionViewController {
     
     // MARK: - Actions
     
+    /// Modally present the Meme editor
     @IBAction func switchToEditMode(sender: AnyObject) {
-        // Modally present the Meme editor:
         NSOperationQueue.mainQueue().addOperationWithBlock {
-            // Grab the storyboard
             let storyboard = UIStoryboard (name: "Main", bundle: nil)
-            // Get the destination view controller from the storyboard id
             let nextVC = storyboard.instantiateViewControllerWithIdentifier("MemeEditor") as! MemeEditor
-            // Go to the editor controller
             self.presentViewController(nextVC, animated: true, completion: nil)
         }
     }
     
     // MARK: - Collection View Delegate
     
-    /**
-        Items count
-    */
+    /// Items count
     override func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return self.memes.count
     }
     
-    /**
-        Cell at index path
-    */
+    /// Cell at index path
     override func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) ->
         UICollectionViewCell {
         
@@ -73,9 +65,7 @@ class MemeCollection: UICollectionViewController {
         return cell
     }
     
-    /**
-        Detail view
-    */
+    /// Detail view
     override func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath:NSIndexPath) {
         NSOperationQueue.mainQueue().addOperationWithBlock {
             // Grab the detail controller from the storyboard
@@ -86,5 +76,4 @@ class MemeCollection: UICollectionViewController {
             self.navigationController?.pushViewController(detailController, animated: true)
         }
     }
-    
 }

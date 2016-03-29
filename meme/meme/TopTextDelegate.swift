@@ -9,20 +9,16 @@
 import Foundation
 import UIKit
 
-/**
-    This delegate is used from the topText. Its intended use is to do the
-    text operations without moving the view while the keyboard shows up, as
-    is the case for the bottomText
-*/
+/// This delegate is used from the topText. Its intended use is to do the text operations without moving the view while the keyboard shows up, as is the case for the bottomText
 class TopTextFieldDelegate: NSObject, UITextFieldDelegate {
     
+    /// Removing default text
     func textFieldDidBeginEditing(textField: UITextField) {
-        // Removing default text
         textField.text = ""
     }
     
+    /// Hides the keyboard uppon return
     func textFieldShouldReturn(textField: UITextField) -> Bool {
-        // Hides the keyboard uppon return
         textField.resignFirstResponder()
         return true
     }

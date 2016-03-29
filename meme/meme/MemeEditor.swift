@@ -8,10 +8,7 @@
 
 import UIKit
 
-class MemeEditor:   UIViewController,
-                    UIImagePickerControllerDelegate,
-                    UINavigationControllerDelegate,
-                    UITextFieldDelegate {
+class MemeEditor:   UIViewController, UINavigationControllerDelegate {
 
     // MARK: - Variables
     
@@ -73,6 +70,7 @@ class MemeEditor:   UIViewController,
     // MARK: - Actions
     
     @IBAction func PickImageFromAlbum(sender: AnyObject) {
+        
         // Initialize the image picker controller
         let picker = UIImagePickerController()
         
@@ -107,8 +105,7 @@ class MemeEditor:   UIViewController,
         // Generate a memed image
         let image = self.generateMemedImage()
         
-        // Define an instance of the ActivityViewController and
-        // pass the ActivityViewController a memedImage as an activity item
+        // Define an instance of the ActivityViewController and pass the ActivityViewController a memedImage as an activity item
         let activityViewController = UIActivityViewController(activityItems: [image], applicationActivities: nil)
         
         // Present the ActivityViewController
@@ -121,15 +118,13 @@ class MemeEditor:   UIViewController,
             // Save the meme just before dismissing the activity view
             (s: String?, ok: Bool, items: [AnyObject]?, err:NSError?) -> Void in
             
-            // Save the meme only if a valid action is selected, do not save
-            // if the user selects the Cancel option
+            // Save the meme only if a valid action is selected, do not save if the user selects the Cancel option
             if ok {
                 self.saveMeme()
                 self.dismissViewControllerAnimated(true, completion: nil)
             }
             
             // Go to the Sent Meme View options with modal presentation
-            
             NSOperationQueue.mainQueue().addOperationWithBlock {
                 let storyboard = UIStoryboard (name: "Main", bundle: nil)
                 let nextVC = storyboard.instantiateViewControllerWithIdentifier("MemeTable") as! MemeTable
@@ -138,14 +133,12 @@ class MemeEditor:   UIViewController,
         }
     }
     
+    /// Dismiss the editor in order to get back to the sent memes being the presenting view controller
     @IBAction func exitEditor(sender: AnyObject) {
-        
-        // Dismiss the editor in order to get back to the sent memes being
-        // the presenting view controller
         self.dismissViewControllerAnimated(true, completion: nil)
     }
     
-    // MARK: - Image capture functions
+    // MARK: - Image Capture Methods
     
     func generateMemedImage() -> UIImage {
         
@@ -168,8 +161,7 @@ class MemeEditor:   UIViewController,
     
     func saveMeme() {
         
-        // Check that an image exists on the picker before attempting to
-        // greate a meme
+        // Check that an image exists on the picker before attempting to greate a meme
         if ((self.ImagePickerView.image) != nil ) {
             
             // Save the meme into the model struct
@@ -187,35 +179,53 @@ class MemeEditor:   UIViewController,
         }
     }
     
-    // MARK: - Keyboard
+    // MARK: - Keyboard Methods
     
     func keyboardWillShow(notification: NSNotification) {
         
-        // Reset the view to it's original position every time the
-        // keyboard is about to show to counter for different keyboard
-        // heights (ie when changing language or emoticons) during the
-        // same runtime
+        // Reset the view to it's original position every time the keyboard is about to show to counter for different keyboard heights (ie when changing language or emoticons) during the same runtime
         self.view.frame.origin.y = 0.0
         
         // Move the keyboard out of the way
         self.view.frame.origin.y -= getKeyboardHeight(notification)
     }
     
+    /// Reset the frame to its original position
     func keyboardWillHide(notification: NSNotification) {
-        // Reset the frame to its original position
         self.view.frame.origin.y = 0.0
     }
     
-    /**
-        Get keyboard height from the notification service
-    */
+    /// Get keyboard height from the notification service
     func getKeyboardHeight(notification: NSNotification) -> CGFloat {
         let userInfo = notification.userInfo
         let keyboardSize = userInfo![UIKeyboardFrameEndUserInfoKey] as! NSValue // of CGRect
         return keyboardSize.CGRectValue().height
     }
     
-    // MARK: - Image Picker Delegate
+    // MARK: - Notification subscriptions
+    
+    func subscribeToKeyboardNotifications() {
+        NSNotificationCenter.defaultCenter().addObserver(
+            self,
+            selector: #selector(MemeEditor.keyboardWillShow(_:)),
+            name: UIKeyboardWillShowNotification,
+            object:nil
+        )
+        NSNotificationCenter.defaultCenter().addObserver(
+            self,
+            selector: #selector(MemeEditor.keyboardWillHide(_:)),
+            name: UIKeyboardWillHideNotification,
+            object:nil
+        )
+    }
+    
+    func unsubscribeFromKeyboardNotifications() {
+        NSNotificationCenter.defaultCenter().removeObserver(self, name: UIKeyboardWillShowNotification, object: nil)
+        NSNotificationCenter.defaultCenter().removeObserver(self, name: UIKeyboardWillHideNotification, object: nil)
+    }
+}
+
+extension MemeEditor: UIImagePickerControllerDelegate {
     
     func imagePickerController(picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : AnyObject]) {
         if let image = info[UIImagePickerControllerEditedImage] as? UIImage {
@@ -241,15 +251,13 @@ class MemeEditor:   UIViewController,
         // Opt to dismiss the picker
         self.dismissViewControllerAnimated(true, completion: nil)
     }
-    
-    // MARK: - Text Field Delegate (bottom text)
-    
-    /**
-        In this delegate the keyboard subscriptions are integrated. They are
-        intended to be used only from the bottomText which requires the 
-        view to move when the keyboard is about to show
-    */
+}
+
+extension MemeEditor: UITextFieldDelegate {
+
+    /// In this delegate the keyboard subscriptions are integrated. They are intended to be used only from the bottomText which requires the view to move when the keyboard is about to show
     func textFieldDidBeginEditing(textField: UITextField) {
+        
         // Enable the view to raise only for the bottom text field
         self.subscribeToKeyboardNotifications()
         
@@ -258,24 +266,13 @@ class MemeEditor:   UIViewController,
     }
     
     func textFieldShouldReturn(textField: UITextField) -> Bool {
+        
         // Hides the keyboard
         textField.resignFirstResponder()
         
         // Disable the view raise for other text fields
         self.unsubscribeFromKeyboardNotifications()
         return true
-    }
-    
-    // MARK: - Notification subscriptions
-    
-    func subscribeToKeyboardNotifications() {
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "keyboardWillShow:", name: UIKeyboardWillShowNotification, object: nil)
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "keyboardWillHide:", name: UIKeyboardWillHideNotification, object: nil)
-    }
-    
-    func unsubscribeFromKeyboardNotifications() {
-        NSNotificationCenter.defaultCenter().removeObserver(self, name: UIKeyboardWillShowNotification, object: nil)
-        NSNotificationCenter.defaultCenter().removeObserver(self, name: UIKeyboardWillHideNotification, object: nil)
     }
     
 }

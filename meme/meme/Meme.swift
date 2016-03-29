@@ -9,18 +9,18 @@
 import Foundation
 import UIKit
 
-/**
-    Meme struct is used as the model of the app. It stores all neccessary data 
-    for the memes
-*/
+/// Meme struct is used as the model of the app. It stores all neccessary data for the memes
 struct Meme {
-    // Properties
+    
+    // MARK: - Properties
+    
     var topText: String!
     var bottomText: String!
     var originalImage: UIImage!
     var memedImage: UIImage!
     
-    // Default constructor
+    // MARK: - Constructors
+    
     init(topText: String, bottomText: String, originalImage: UIImage, memedImage: UIImage) {
         self.topText = topText
         self.bottomText = bottomText
