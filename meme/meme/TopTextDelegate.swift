@@ -13,12 +13,12 @@ import UIKit
 class TopTextFieldDelegate: NSObject, UITextFieldDelegate {
     
     /// Removing default text
-    func textFieldDidBeginEditing(textField: UITextField) {
+    func textFieldDidBeginEditing(_ textField: UITextField) {
         textField.text = ""
     }
     
     /// Hides the keyboard uppon return
-    func textFieldShouldReturn(textField: UITextField) -> Bool {
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()
         return true
     }

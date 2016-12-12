@@ -21,7 +21,7 @@ class MemeDetails: UIViewController {
     
     // MARK: - Lifecycle
     
-    override func viewWillAppear(animated: Bool) {
+    override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         self.imageView!.image = self.meme.memedImage
     }
