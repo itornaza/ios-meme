@@ -27,7 +27,7 @@
                                 </constraints>
                                 <items>
                                     <barButtonItem style="plain" systemItem="flexibleSpace" id="ukx-Cz-7RS"/>
-                                    <barButtonItem title="Album" width="50" id="G5R-0l-Owz">
+                                    <barButtonItem title="Album" id="G5R-0l-Owz">
                                         <connections>
                                             <action selector="PickImageFromAlbum:" destination="vXZ-lx-hvc" id="nGb-u2-ll1"/>
                                         </connections>
@@ -226,7 +226,7 @@
                                 <rect key="frame" x="0.0" y="86" width="375" height="44"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="k7Q-3R-i1j" id="ry8-Oh-nXu">
-                                    <frame key="frameInset" width="375" height="43.5"/>
+                                    <frame key="frameInset" width="375" height="43"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                 </tableViewCellContentView>
                             </tableViewCell>
